@@ -1,12 +1,6 @@
 "use client";
-
-import Login from "./login";
-
+import { redirect } from "next/navigation";
 function App() {
-  return (
-    <>
-      <Login />
-    </>
-  );
+  redirect("/Login");
 }
 export default App;

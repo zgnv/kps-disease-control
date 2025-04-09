@@ -83,7 +83,7 @@ class http {
         "application/json; charset=utf-8";
     }
     const newOptions = { ...defaultOptions, ...options };
-    console.log("newOptions", newOptions);
+    // console.log("newOptions", newOptions);
 
     return fetch(`${API_BASE_URL}${url}`, newOptions)
       .then(checkStatus)

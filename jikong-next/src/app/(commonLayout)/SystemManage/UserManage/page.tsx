@@ -1,6 +1,6 @@
-import TitleComponent from "../../components/ShowComponent/TitleComponent";
-import LeftComponent from "../../components/ShowComponent/LeftComponent";
-import RightComponent from "../../components/ShowComponent/RightComponent";
+import TitleComponent from "@/app/components/ShowComponent/TitleComponent";
+import LeftComponent from "@/app/components/ShowComponent/LeftComponent";
+import RightComponent from "@/app/components/ShowComponent/RightComponent";
 export default function UserManage() {
   return (
     <div className="w-full h-full flex flex-col">

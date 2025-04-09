@@ -12,18 +12,19 @@ export default function Login() {
   // const setUserToken = useUserTokenStore((state) => state.setUserToken);
   const router = useRouter();
   const userLogin = async (logInfo: logType) => {
-    fetchApi.post("/login", { ...logInfo }).then((res) => {
-      if (res.code === 200) {
-        sessionStorage.setItem("tokenName", res.data.tokenName);
-        sessionStorage.setItem("tokenValue", res.data.tokenValue);
-        router.push("/SystemManage");
-      } else {
-        messageApi.open({
-          type: "error",
-          content: res.msg,
-        });
-      }
-    });
+    router.push("/SystemManage");
+    // fetchApi.post("/login", { ...logInfo }).then((res) => {
+    //   if (res.code === 200) {
+    //     sessionStorage.setItem("tokenName", res.data.tokenName);
+    //     sessionStorage.setItem("tokenValue", res.data.tokenValue);
+    //     router.push("/SystemManage");
+    //   } else {
+    //     messageApi.open({
+    //       type: "error",
+    //       content: res.msg,
+    //     });
+    //   }
+    // });
   };
   const onFinish = (values: logType) => {
     userLogin({ ...values });
