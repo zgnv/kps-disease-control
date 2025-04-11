@@ -32,6 +32,48 @@ export default function TitleComponent(props: any) {
           </div>
         </>
       )}
+      {props.type === "batchManagment" && (
+        <>
+          <div className="h-[50px] flex flex-col justify-start">
+            <span className="text-[24px] font-semibold">批次号管理</span>
+          </div>
+          <div className="flex-1 flex flex-col justify-start">
+            <span className="text-slate-500">管理批次号</span>
+          </div>
+        </>
+      )}
+      {props.type === "corpusUpload" && (
+        <>
+          <div className="h-[50px] flex flex-col justify-start">
+            <span className="text-[24px] font-semibold">语料上传</span>
+          </div>
+          <div className="flex-1 flex flex-col justify-start">
+            <span className="text-slate-500">语料上传</span>
+          </div>
+        </>
+      )}
+      {props.type === "searchRequest" && (
+        <>
+          <div className="h-[50px] flex flex-col justify-start">
+            <span className="text-[24px] font-semibold">检索申请</span>
+          </div>
+          <div className="flex-1 flex flex-col justify-start">
+            <span className="text-slate-500">
+              通过文件类型、业务类型、标签进行查询和申请
+            </span>
+          </div>
+        </>
+      )}
+      {props.type === "corpusMaintenance" && (
+        <>
+          <div className="h-[50px] flex flex-col justify-start">
+            <span className="text-[24px] font-semibold">语料维护</span>
+          </div>
+          <div className="flex-1 flex flex-col justify-start">
+            <span className="text-slate-500">修改和管理已上传的语料信息</span>
+          </div>
+        </>
+      )}
     </div>
   );
 }

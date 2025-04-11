@@ -1,0 +1,14 @@
+.file_type_img{
+  height: 70vh;
+  overflow: auto;
+}
+
+.file_type_json{
+  height: 70vh;
+  overflow: auto;
+}
+
+.file_type_pdf{
+  height: 70vh;
+  overflow: auto;
+}

@@ -1,0 +1,10 @@
+.box_info{
+  width: 100%;
+  height: 100%;
+}
+
+.table_box{
+  width: 100%;
+  height: 90%;
+  overflow: auto;
+}

@@ -8,7 +8,7 @@ import { useRouter } from "next/navigation";
 type MenuItem = Required<MenuProps>["items"][number];
 const items: MenuItem[] = [
   {
-    key: "systemManage",
+    key: "SystemManage",
     label: "系统管理",
     icon: <DesktopOutlined />,
     children: [
@@ -17,12 +17,28 @@ const items: MenuItem[] = [
       { key: "PermissionManage", label: "权限管理" },
     ],
   },
+  {
+    key: "CorpusCollect",
+    label: "语料采集",
+    icon: <DesktopOutlined />,
+    children: [
+      { key: "Batch", label: "批次号管理" },
+      // { key: "Upload", label: "语料上传" },
+      { key: "Maintain", label: "语料维护" },
+    ],
+  },
+  {
+    key: "CorpusApplication",
+    label: "语料应用",
+    icon: <DesktopOutlined />,
+    children: [{ key: "Search", label: "检索申请" }],
+  },
 ];
 export default function Side() {
   const router = useRouter();
   const onClick: MenuProps["onClick"] = (e) => {
     setActiveSideMenu(e.key);
-    router.push(`/SystemManage/${e.key}`);
+    router.push(`/${e.keyPath[1]}/${e.key}`);
   };
   const setActiveSideMenu = useSideStore((state) => state.setSideSelected);
   return (

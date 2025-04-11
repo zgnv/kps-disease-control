@@ -1,0 +1,40 @@
+.title{
+  font-size: 24px;
+  font-weight: 600;
+  color: #333;
+  font-style: normal;
+}
+
+.introduce{
+  /* margin-top: 20px; */
+  font-size: 12px;
+  font-weight: 400;
+  color: #5A5B5F;
+}
+.text{
+  color: #333;
+}
+
+.form_box{
+  margin-top: 24px;
+}
+
+.save_btn{
+  width: 180px;
+  margin-top: 20px;
+  text-align: center;
+}
+
+.left_box{
+  height: 100%;
+  overflow: auto;
+}
+
+.right_box{
+  width: 60%;
+}
+
+.right_table{
+  width: 100%;
+  overflow: auto;
+}

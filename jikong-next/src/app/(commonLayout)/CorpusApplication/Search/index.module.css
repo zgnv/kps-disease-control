@@ -1,0 +1,100 @@
+.box_info{
+  width: 100%;
+  height: calc(100% - 120px);
+}
+
+.table_box{
+  width: 100%;
+  height: 90%;
+  overflow: auto;
+}
+
+.modal_header{
+  display: flex;
+  align-items: center;
+  height: 50px;
+  font-size: 18px;
+  position: absolute;
+  top: -58px;
+  left: 0px;
+  width: 400px;
+  height: 70px;
+  border-radius: 8px;
+}
+
+.trapezoid {
+  position: relative;
+  width: 200px;
+  height: 68px;
+  overflow: hidden;
+  z-index: 99;
+  cursor: pointer;
+}
+
+.trapezoid svg {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+}
+
+.trapezoid-content {
+  position: relative;
+  z-index: 1;
+  padding: 20px;
+  color: white;
+}
+
+.trapezoidContent{
+  height: 100%;
+  display: flex;
+  align-items: center;
+  padding: 0 30px;
+  position: absolute;
+  color: #696C7A;
+  font-size: 18px;
+}
+.select_trapezoidContent{
+  height: 100%;
+  display: flex;
+  align-items: center;
+  padding: 0 30px;
+  position: absolute;
+  color: #1960F6 ;
+  font-size: 18px;
+  font-weight: 500;
+}
+
+.rectangle {
+  position: relative;
+  left: -36px;
+  width: 185px;
+  height: 56px;
+  overflow: hidden;
+  z-index: 98;
+  cursor: pointer;
+}
+
+.rectangle svg {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+}
+.select_rectangleContent {
+  position: relative;
+  z-index: 1;
+  padding: 20px;
+  color: #1960F6 ;
+  font-weight: 500;
+  padding: 13px 0 0 54px;
+}
+.rectangleContent {
+  position: relative;
+  z-index: 1;
+  padding: 20px;
+  color: #696C7A;
+  padding: 13px 0 0 54px;
+}
