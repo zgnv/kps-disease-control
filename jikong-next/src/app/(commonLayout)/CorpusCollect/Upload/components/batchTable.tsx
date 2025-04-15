@@ -22,47 +22,12 @@ interface BatchLeftProps {
 }
 
 const BatchTable: React.FC<BatchLeftProps> = (props) => {
+  const {currentBatchNo} = props
   const { TextArea } = Input;
   const [form] = Form.useForm();
   // 加载动画
   const [loading, setLoading] = useState(false);
   const columns: TableProps<DataType>["columns"] = [
-    // {
-    //   title: "文件名",
-    //   dataIndex: "name1",
-    //   key: "name1",
-    //   // 隐藏列但保留 DOM
-    //   onCell: () => ({ style: { display: "none" } }), // 隐藏单元格
-    //   onHeaderCell: () => ({ style: { display: "none" } }), // 隐藏表头
-    //   render: (_, record) => (
-    //     <Form.Item
-    //       style={{ display: "none" }}
-    //       name={["files", record.key, "name"]}
-    //       initialValue={record.name}
-    //       noStyle
-    //     >
-    //       <Input style={{ display: "none" }} />
-    //     </Form.Item>
-    //   ),
-    // },
-    // {
-    //   title: "文件类型",
-    //   dataIndex: "type",
-    //   key: "type",
-    //   // 隐藏列但保留 DOM
-    //   onCell: () => ({ style: { display: "none" } }), // 隐藏单元格
-    //   onHeaderCell: () => ({ style: { display: "none" } }), // 隐藏表头
-    //   render: (_, record) => (
-    //     <Form.Item
-    //       style={{ display: "none" }}
-    //       name={["files", record.key, "type"]}
-    //       initialValue={record.type}
-    //       noStyle
-    //     >
-    //       <Input style={{ display: "none" }} />
-    //     </Form.Item>
-    //   ),
-    // },
     {
       title: "文件名",
       dataIndex: "name",
@@ -255,7 +220,6 @@ const BatchTable: React.FC<BatchLeftProps> = (props) => {
   const getTableData = async () => {
     setLoading(true);
     // const res  =awa
-    const date = "2024-5-20";
     const res: PageRes<DataType> = {
       total: 100,
       current: 1,
@@ -274,7 +238,7 @@ const BatchTable: React.FC<BatchLeftProps> = (props) => {
         fungibleFile: "String", //可替代文件
         isOpen: true, //是否公开资料
         isEfftct: true, //是否最新有效
-        fileInfo: "jieshao ", //文件介绍
+        fileInfo: "jieshao", //文件介绍
       })),
     };
     setTableData(res);
@@ -283,11 +247,27 @@ const BatchTable: React.FC<BatchLeftProps> = (props) => {
 
   // 批量保存语料
   const save = () => {
-    const values = form.getFieldsValue();
-    // 通过ref获取当前表单值
+    const formValues = form.getFieldsValue();
+    const result= tableData?.records.map((record) => ({
+      ...record,
+      ...formValues.files?.[record.key], // 合并表单字段
+    }));
+    const req=result?.map(item=>{
+      return{
+        batchId: item.batchId,
+        name:item.name,
+        type:item.type,
+        resultFileType:item.resultFileType,
+        businessType:item.businessType,
+        effectDate:dayjs(item.effectDate).format('YYYY-MM-DD'),
+        fungibleFile:item.fungibleFile,
+        isOpen:item.isOpen,
+        isEfftct:item.isEfftct,
+        fileInfo:item.fileInfo,
+      }
+    })
     
-    console.log(values, "表单值");
-
+    console.log(req, "表单值");
     // console.log(tableData?.records, "tableData?.records");
   };
 

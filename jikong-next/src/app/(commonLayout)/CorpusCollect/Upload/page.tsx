@@ -20,6 +20,8 @@ export default function CorpusUpload() {
   useEffect(() => {
     const query = new URLSearchParams(window.location.search);
     const batchId = query.get("batchId");
+    console.log(batchId,'batchId');
+    
     if (batchId) {
       setCurrentBatchNo(batchId);
     }

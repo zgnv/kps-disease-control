@@ -1,29 +1,30 @@
-// 表格数据
+// 添加入库单号表单
 export interface DataType {
   batchId: string;
-  key: number;
-  //   入库单号
+  batchDesc: string; //介绍
+}
+
+// 入库单列表
+export interface InboundListPageRes {
   id: number;
-  name: String; //文件名
-  type: String; //文件类型
-  resultFileType: String; //结果文件类型
-  businessType: String; //业务类型
-  effectDate: any; //生效生成日期
-  fungibleFile: String; //可替代文件
-  isOpen: Boolean; //是否公开资料
-  isEfftct: Boolean; //是否最新有效
-  fileInfo: String; //文件介绍
+  batchId: string; //入库号
+  status: number; //状态
+  uploadDesc: string; // 介绍
+  totalFiles?: number; //文件数量
+  completedFiles: number;
+  createdBy: number;
+  createTime: string;
 }
 
 // 添加批次号请求体
 export interface addInboundRequest {
   //   描述
-  info: string;
+  batchDesc: string;
 }
 
 // 修改入库单号
 export interface updateInboundRequest {
-  id: number;
+  batchId?: string;
   //   描述
-  info: string;
+  batchDesc: string;
 }

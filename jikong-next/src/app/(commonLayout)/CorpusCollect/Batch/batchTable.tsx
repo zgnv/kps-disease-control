@@ -1,39 +1,45 @@
 "use client";
-import { DataType } from "@/app/types/batchType";
+import { usePageRes } from "@/app/components/hooks/UsePageRes";
+import { queryBatchApi } from "@/app/service/corpusCollect/batch";
+import { DataType, InboundListPageRes } from "@/app/types/batchType";
 import { PlusOutlined } from "@ant-design/icons";
 import { Button, Col, Modal, Row, Space, Table, TableProps } from "antd";
+import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
-import { PageRes, usePageRes } from "@/app/components/hooks/UsePageRes";
 import AddBatchModal from "./addBatchModal";
 import styles from "./index.module.css";
-import { useRouter } from "next/navigation";
 
 export default function BatchTable() {
-  const columns: TableProps<DataType>["columns"] = [
+  const columns: TableProps<InboundListPageRes>["columns"] = [
     {
       title: "ID",
       dataIndex: "id",
       key: "id",
     },
     {
+      title: "入库单号",
+      dataIndex: "batchId",
+      key: "batchId",
+    },
+    {
       title: "描述",
-      dataIndex: "info",
-      key: "info",
+      dataIndex: "uploadDesc",
+      key: "uploadDesc",
     },
     {
       title: "文件数量",
-      dataIndex: "fileNum",
-      key: "fileNum",
+      dataIndex: "totalFiles",
+      key: "totalFiles",
     },
     {
       title: "创建人",
-      dataIndex: "CreateBy",
-      key: "fileNum",
+      dataIndex: "createdBy",
+      key: "createdBy",
     },
     {
       title: "创建时间",
       dataIndex: "createTime",
-      key: "fileNum",
+      key: "totalFiles",
     },
     {
       title: "操作",
@@ -61,21 +67,23 @@ export default function BatchTable() {
     },
   ];
   const router = useRouter();
+  // 加载动画
+  const [loading, setLoading] = useState(false);
   //   添加批次号弹窗
   const [isAddUserModalOpen, setIsAddUserModalOpen] = useState(false);
-  const [tableData, setTableData] = usePageRes<DataType>();
+  const [tableData, setTableData] = usePageRes<InboundListPageRes>();
   //   当前修改的入库单号
-  const [currentBatchNo, setCurrentBatchNo] = useState<DataType>();
+  const [currentBatchNo, setCurrentBatchNo] = useState<InboundListPageRes>();
   //   弹窗类型
   const [modalType, setModalType] = useState<"add" | "edit">("add");
   //   分页入参
   const [pageReq, setPageReq] = useState({
-    page: 1,
-    pageSize: 10,
+    PageNo: 1,
+    PageSize: 10,
   });
 
   useEffect(() => {
-    getTableData();
+    // getTableData();
   }, []);
 
   useEffect(() => {
@@ -94,25 +102,18 @@ export default function BatchTable() {
 
   //   获取表格数据
   const getTableData = async () => {
-    // const res  =awa
-    const res: PageRes<DataType> = {
-      total: 100,
-      current: 1,
-      pages: 10,
-      size: 10,
-      records: Array.from({ length: 100 }).map<DataType>((_, i) => ({
-        batchId: i + 1 + "",
-        key: i + 1,
-        id: i + 1,
-        info: `西湖区湖底公园${i + 1}号`,
-        fileNum: i + 1,
-      })),
-    };
-    setTableData(res);
+    try {
+      setLoading(true);
+      const res = await queryBatchApi(pageReq);
+      setTableData(res.data);
+      setLoading(false);
+    } finally {
+      setLoading(false);
+    }
   };
 
   //   修改入库单号
-  const edit = (record: DataType) => {
+  const edit = (record: InboundListPageRes) => {
     setModalType("edit");
     setIsAddUserModalOpen(true);
     setCurrentBatchNo(record);
@@ -120,11 +121,11 @@ export default function BatchTable() {
 
   //   分页切换
   const handleTableChange = (pagination: any, filters: any, sorter: any) => {
-    setPageReq({ page: pagination.current, pageSize: pagination.pageSize });
+    setPageReq({ PageNo: pagination.current, PageSize: pagination.PageSize });
   };
 
   // 上传文件 路由跳转
-  const upload = (value: DataType) => {
+  const upload = (value: InboundListPageRes) => {
     router.push(`/CorpusCollect/Upload?batchId=${value.batchId}`);
   };
   return (
@@ -142,11 +143,13 @@ export default function BatchTable() {
         </Col>
         <Col span={24} className={styles.table_box}>
           <Table
-            dataSource={tableData?.records}
+            loading={loading}
+            dataSource={tableData?.list}
             columns={columns}
+            rowKey={(row) => row.batchId}
             pagination={{
-              current: pageReq.page,
-              pageSize: pageReq.pageSize,
+              current: pageReq.PageNo,
+              pageSize: pageReq.PageSize,
               total: tableData?.total,
               showSizeChanger: true,
               showQuickJumper: true,
@@ -158,15 +161,17 @@ export default function BatchTable() {
       </Row>
       {/* 添加入库号弹窗 */}
       <Modal
-        title="添加批次号"
+        title={modalType === "add" ? "添加批次号" : "修改批次号"}
         open={isAddUserModalOpen}
         onOk={closeModal}
         footer={null}
         onCancel={closeModal}
         width={600}
+        destroyOnClose={false}
       >
         <AddBatchModal
           closeModal={closeModal}
+          refreshList={getTableData}
           currentBatchNo={currentBatchNo}
           modalType={modalType}
         />

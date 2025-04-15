@@ -1,21 +1,29 @@
 "use client";
-import { Button, Form, Input, Space } from "antd";
+import { addBatchApi, updateBatchApi } from "@/app/service/corpusCollect/batch";
 import {
-  DataType,
   addInboundRequest,
-  updateInboundRequest,
+  InboundListPageRes,
+  updateInboundRequest
 } from "@/app/types/batchType";
+import { Button, Form, Input, message, Space } from "antd";
 import { useEffect } from "react";
 const { TextArea } = Input;
 
 interface AddBatchModalProps {
   closeModal: () => void;
-  currentBatchNo?: DataType;
+  refreshList: () => void;
+  currentBatchNo?: InboundListPageRes;
   modalType: "add" | "edit";
 }
 
 const AddBatchModal: React.FC<AddBatchModalProps> = (props) => {
-  const { currentBatchNo, closeModal, modalType } = props;
+  const {
+    currentBatchNo,
+    closeModal,
+    modalType,
+    refreshList,
+  } = props;
+  const [messageApi, contextHolder] = message.useMessage();
   const [form] = Form.useForm();
   const tailLayout = {
     wrapperCol: { offset: 8, span: 16 },
@@ -25,35 +33,53 @@ const AddBatchModal: React.FC<AddBatchModalProps> = (props) => {
     // 修改数据回显
     if (currentBatchNo) {
       form.setFieldsValue({
-        info: currentBatchNo.info,
+        batchDesc: currentBatchNo.uploadDesc,
       });
     }
   }, [currentBatchNo]);
 
-  const onFinish = async (values: any) => {
+  const onFinish = async () => {
     const value = await form.validateFields();
-    console.log(value, "value");
     if (modalType === "add") {
       const req: addInboundRequest = {
-        info: value.info,
+        batchDesc: value.batchDesc,
       };
-      console.log(req,'req1');
+      const res = await addBatchApi(req);
+      if (res.code === 200) {
+        messageApi.open({
+          type: "success",
+          content: `添加成功！`,
+        });
+        refreshList();
+        close();
+      }
     } else {
       if (!currentBatchNo) return;
       const req: updateInboundRequest = {
-        info: value.info,
-        id: currentBatchNo.id,
+        batchDesc: value.batchDesc,
+        batchId: currentBatchNo.batchId,
       };
+      const res = await updateBatchApi(req);
+      if (res.code === 200) {
+        messageApi.open({
+          type: "success",
+          content: `修改成功！`,
+        });
+        refreshList();
+        close();
+      }
     }
     closeModal();
   };
 
   const close = () => {
+    form.resetFields();
     closeModal();
   };
 
   return (
     <>
+      {contextHolder}
       <Form
         layout="vertical"
         name="vertical"
@@ -62,7 +88,7 @@ const AddBatchModal: React.FC<AddBatchModalProps> = (props) => {
         wrapperCol={{ span: 24 }}
         onFinish={onFinish}
       >
-        <Form.Item label="描述" name="info" rules={[{ required: true }]}>
+        <Form.Item label="描述" name="batchDesc" rules={[{ required: true }]}>
           <TextArea rows={4} placeholder="请输入描述" />
         </Form.Item>
         <Form.Item {...tailLayout}>

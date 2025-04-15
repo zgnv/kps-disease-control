@@ -10,7 +10,7 @@ export interface PageRes<T> {
   total: number;
   // 每页显示条数
   size: number;
-  records: T[];
+  list: T[];
 }
 
 type IUsePageResProps<T> = PageRes<T> | null;

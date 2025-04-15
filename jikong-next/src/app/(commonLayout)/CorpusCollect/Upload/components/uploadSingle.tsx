@@ -3,10 +3,21 @@ import { Upload, message, UploadProps, UploadFile, Modal } from "antd";
 import { InboxOutlined, DeleteOutlined } from "@ant-design/icons";
 import type { RcFile } from "antd/es/upload";
 import axios from "axios";
+import {
+  deleteFileApi,
+  queryFileListApi,
+  uploadFileApi,
+} from "@/app/service/corpusCollect/upload";
+import { getToken } from "@/lib/fetchApi";
+import { API_BASE_URL } from "@/lib/constants";
 
 const { Dragger } = Upload;
 const { confirm } = Modal;
 const MAX_FILE_SIZE = 20 * 1024 * 1024; // 20MB
+
+interface FileResInterFace {
+  fileNameType: string;
+}
 
 interface FileUploadProps {
   initialFiles?: UploadFile[]; // 初始文件列表（用于编辑时回显）
@@ -17,6 +28,7 @@ interface FileUploadProps {
 const FileUploadWithPreview: React.FC<FileUploadProps> = (props) => {
   const { initialFiles, selectFile, currentBatchNo } = props;
   const [fileList, setFileList] = useState<any>(initialFiles);
+  const [messageApi, contextHolder] = message.useMessage();
   // 创建一个 FormData 对象
   const formData = new FormData();
 
@@ -27,28 +39,23 @@ const FileUploadWithPreview: React.FC<FileUploadProps> = (props) => {
   }, [currentBatchNo]);
 
   // 获取回显文件列表
-  const getEchoFileList = () => {
-    // const res = await
-    const res = {
-      data: [
-        {
-          fileName: "文件01",
-          fileType: "pdf",
-        },
-        {
-          fileName: "文件02",
-          fileType: "png",
-        },
-      ],
-    };
-    const files = res.data.map((file, index) => ({
-      uid: (index + 1).toString(),
-      name: file.fileName,
-      status: "done",
-      type: file.fileType,
-    }));
-    console.log(files, "filesfiles");
-    setFileList(files);
+  const getEchoFileList = async () => {
+    if (!currentBatchNo) return;
+    const res = await queryFileListApi("2121userName");
+    if (res.data && res.data.length) {
+      const arrRes: FileResInterFace[] = res.data.map((item: string) => {
+        return {
+          fileNameType: item,
+        };
+      });
+      const files = arrRes?.map((file, index) => ({
+        uid: (index + 1).toString(),
+        name: file.fileNameType,
+        status: "done",
+        type: file.fileNameType.split(".").pop() ?? "",
+      }));
+      setFileList(files);
+    }
   };
   /**
    * 校验文件类型和大小
@@ -57,7 +64,10 @@ const FileUploadWithPreview: React.FC<FileUploadProps> = (props) => {
     // 校验文件大小
     const isLtMaxSize = file.size / 1024 / 1024 <= 20;
     if (!isLtMaxSize) {
-      message.error(`文件大小不能超过 20MB`);
+      messageApi.open({
+        type: "error",
+        content: "文件大小不能超过 20MB",
+      });
       return false;
     }
 
@@ -66,7 +76,10 @@ const FileUploadWithPreview: React.FC<FileUploadProps> = (props) => {
       (f: UploadFile) => f.name === file.name && f.type === file.type
     );
     if (isDuplicate) {
-      message.error(`同一类型不允许上传相同名字的文件`);
+      messageApi.open({
+        type: "warning",
+        content: "同一类型不允许上传相同名字的文件",
+      });
       return false;
     }
 
@@ -83,25 +96,28 @@ const FileUploadWithPreview: React.FC<FileUploadProps> = (props) => {
   };
 
   // 自定义删除逻辑
-  const handleRemove: UploadProps["onRemove"] = (file) => {
+  const handleRemove: UploadProps["onRemove"] = async (file) => {
     confirm({
       title: "确认删除文件？",
       content: `确定要删除 ${file.name} 吗？`,
       onOk: async () => {
+        if (!file.type || !currentBatchNo) return;
         const req = {
           batchId: currentBatchNo,
           fileName: file.name,
           fileType: file.type,
         };
-        console.log(req, "req");
-
         // 1. 如果是服务器文件，调用删除接口
-        // await axios.delete(`/api/files/${file.uid}`);
-
-        // 2. 更新 fileList
-        const newFileList = fileList.filter((f) => f.uid !== file.uid);
-        setFileList(newFileList);
-        message.success(`${file.name} 已删除`);
+        const res = await deleteFileApi(req);
+        if (res.code === 200) {
+          // 2. 更新 fileList
+          const newFileList = fileList.filter((f: any) => f.uid !== file.uid);
+          setFileList(newFileList);
+          messageApi.open({
+            type: "success",
+            content: `${file.name} 已删除`,
+          });
+        }
       },
     });
     return false; // 阻止默认删除行为
@@ -122,21 +138,18 @@ const FileUploadWithPreview: React.FC<FileUploadProps> = (props) => {
 
     try {
       const response = await axios.post(
-        "https://660d2bd96ddfa2943b33731c.mockapi.io/api/upload",
+        `${API_BASE_URL}/file/upload`,
         formData,
         {
-          headers: { "Content-Type": "multipart/form-data" },
-          onUploadProgress: (progressEvent) => {
-            //   const percent = Math.round(
-            //     (progressEvent.loaded * 100) / progressEvent.total
-            //   );
-            //   onProgress({ percent });
+          headers: {
+            Authorization: `Bearer ${getToken()}`,
+            "Content-Type": "multipart/form-data",
           },
         }
       );
-      setFileList({ ...fileList, file });
-      //   onSuccess(response.data, file);
-      //   message.success(`${file.name} 上传成功`);
+      // setFileList({ ...fileList, file });
+      // onSuccess(response.data, file);
+      // message.success(`${file.name} 上传成功`);
     } catch (error) {
       //   onError(error as Error);
       //   message.error(`${file.name} 上传失败`);
@@ -163,28 +176,31 @@ const FileUploadWithPreview: React.FC<FileUploadProps> = (props) => {
   };
 
   return (
-    <Dragger
-      name="file"
-      style={{ cursor: "pointer" }}
-      multiple={true}
-      fileList={fileList}
-      onChange={handleChange}
-      onRemove={handleRemove}
-      beforeUpload={beforeUpload}
-      onPreview={handlePreview} // 点击文件时的回调
-      showUploadList={{
-        showRemoveIcon: true,
-        removeIcon: <DeleteOutlined />,
-      }}
-      // 如果不需要自动上传到服务器，添加以下配置：
-      customRequest={customRequest}
-    >
-      <p className="ant-upload-drag-icon">
-        <InboxOutlined />
-      </p>
-      <p className="ant-upload-text">拖拽文件至此，或者点击上传</p>
-      <p className="ant-upload-hint">支持pdf、word、excel等格式</p>
-    </Dragger>
+    <div style={{ cursor: "pointer", height: "240px" }}>
+      {contextHolder}
+      <Dragger
+        name="file"
+        style={{ cursor: "pointer" }}
+        multiple={true}
+        fileList={fileList}
+        onChange={handleChange}
+        onRemove={handleRemove}
+        beforeUpload={beforeUpload}
+        onPreview={handlePreview} // 点击文件时的回调
+        showUploadList={{
+          showRemoveIcon: true,
+          removeIcon: <DeleteOutlined />,
+        }}
+        // 如果不需要自动上传到服务器，添加以下配置：
+        customRequest={customRequest}
+      >
+        <p className="ant-upload-drag-icon">
+          <InboxOutlined />
+        </p>
+        <p className="ant-upload-text">拖拽文件至此，或者点击上传</p>
+        <p className="ant-upload-hint">支持pdf、word、excel等格式</p>
+      </Dragger>
+    </div>
   );
 };
 

@@ -19,7 +19,6 @@ interface AddBatchModalProps {
 }
 
 const SingleForm: React.FC<AddBatchModalProps> = (props) => {
-  // export default function singleRight() {
   const { singleFileResult, currentBatchNo } = props;
   const [form] = Form.useForm();
   const { TextArea } = Input;
@@ -41,7 +40,6 @@ const SingleForm: React.FC<AddBatchModalProps> = (props) => {
     console.log(singleFileResult, "form组件的回显");
     // 获取数据回显
     if (singleFileResult) {
-      console.log(singleFileResult.effectDate, "singleFileResult.fileInfo");
       form.setFieldsValue({
         businessType: "业务类型",
         fungibleFile: "可替代",

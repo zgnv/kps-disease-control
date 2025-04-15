@@ -45,7 +45,7 @@ const handleError = (error) => {
     data: false,
   };
 };
-const getToken = () => {
+export const getToken = () => {
   return sessionStorage.getItem("tokenValue");
 };
 class http {
@@ -106,10 +106,16 @@ class http {
 
     //可以是上传键值对形式，也可以是文件，使用append创造键值对数据
     if (options.type === "FormData" && options.body !== "undefined") {
+      console.log(options,'options');
+      
       let params = new FormData();
       for (let key of Object.keys(options.body)) {
         params.append(key, options.body[key]);
       }
+   // 打印FormData的值
+   for (let [key, value] of params.entries()) {
+    console.log(`${key}: ${value}`);
+  }
 
       options.body = params;
     }
@@ -125,6 +131,17 @@ class http {
     const options = Object.assign({ method: "PUT" }, option);
     options.body = JSON.stringify(params);
     return http.staticFetch(url, options); //类的静态方法只能通过类本身调用
+  }
+
+  /**
+   * delete方法
+   * @param url
+   * @returns {Promise<unknown>}
+   */
+  delete(url, params = {}, option = {}) {
+    const options = Object.assign({ method: "DELETE" }, option);
+    options.body = JSON.stringify(params);
+    return http.staticFetch(url, options); //类的静态方法只能通过类本身调用 
   }
 
   /**
